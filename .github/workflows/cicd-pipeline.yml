@@ -25,4 +25,4 @@ jobs:
 
     - name: Run Apex Tests
       run: |
-        sfdx force:apex:test:run -r human -w 10
+        sf apex test run -r human -w 10 -o Prod
