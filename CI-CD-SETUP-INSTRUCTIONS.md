@@ -16,6 +16,7 @@ Before the pipeline can run, you need to configure the following GitHub secrets 
 ### For Dev Hub Authentication
 - `DEV_HUB_USERNAME` - Your Salesforce DX Dev Hub username
 - `CLIENT_ID` - Your Connected App Client ID
+- `CLIENT_SECRET` - Your Connected App Client Secret (required for JWT auth)
 
 ### For Production Deployment (Optional)
 - `PROD_USERNAME` - Your production org username (only needed if deploying to prod)

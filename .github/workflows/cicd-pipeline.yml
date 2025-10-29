@@ -27,9 +27,7 @@ jobs:
 
     - name: Authenticate Dev Hub
       run: |
-        sfdx force:auth:web:login -d -i ${{ secrets.CLIENT_ID }} -r ${{ secrets.DEV_HUB_USERNAME }}
-      env:
-        SF_AUTOUPDATE_DISABLE: true
+        sfdx force:auth:jwt:grant -u ${{ secrets.DEV_HUB_USERNAME }} -i ${{ secrets.CLIENT_ID }} -r https://login.salesforce.com
 
     - name: Create Scratch Org
       id: scratchorg
