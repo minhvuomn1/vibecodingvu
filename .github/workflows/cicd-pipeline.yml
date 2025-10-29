@@ -19,8 +19,9 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install Dependencies
-      run: npm install
+    - name: Install Salesforce CLI
+      run: |
+        npm install -g @salesforce/cli
 
     - name: Run LWC Lint
       run: npm run lint || true
