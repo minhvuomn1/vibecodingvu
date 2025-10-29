@@ -25,4 +25,4 @@ jobs:
 
     - name: Run Apex Tests
       run: |
-        sf apex test run -r human -w 10 -o Prod
+        sf apex test run -r human -w 10 -o jeamsont2017350@agentforce.com
