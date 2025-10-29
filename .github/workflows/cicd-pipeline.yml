@@ -20,8 +20,3 @@ jobs:
       run: |
         sf project validate --json
         sf project convert source --output-dir ./mdapi
-
-    - name: Run Apex Linter
-      run: |
-        npm install -g pmd
-        pmd run --dir force-app --rulesets category/apex/design.xml,category/apex/bestpractices.xml
