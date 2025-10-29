@@ -1,0 +1,16 @@
+<template>
+    <lightning-card title="Todo List">
+        <template if:true={hasData}>
+            <lightning-datatable
+                key-field="Id"
+                data={todos}
+                columns={columns}
+                onrowaction={handleRowAction}
+                onsave={handleCellChange}>
+            </lightning-datatable>
+        </template>
+        <template if:false={hasData}>
+            <div class="slds-p-around_medium slds-text-color_weak">No todos found.</div>
+        </template>
+    </lightning-card>
+</template>

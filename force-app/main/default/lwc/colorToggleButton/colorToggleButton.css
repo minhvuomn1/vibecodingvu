@@ -1,0 +1,17 @@
+button {
+    transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+/* Trạng thái mặc định (inactive): đỏ #b71c1c */
+button.inactive {
+    background-color: #b71c1c;
+    color: #ffffff;
+    border-color: #b71c1c;
+}
+
+/* Trạng thái active: xanh #1b5e20 */
+button.active {
+    background-color: #1b5e20;
+    color: #ffffff;
+    border-color: #1b5e20;
+}
