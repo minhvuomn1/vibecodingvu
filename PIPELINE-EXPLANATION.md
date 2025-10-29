@@ -1,6 +1,6 @@
-# CI/CD Pipeline Explanation
+# Build and Test Pipeline Explanation
 
-This document provides a comprehensive explanation of the CI/CD pipeline implemented for this Salesforce project.
+This document provides a comprehensive explanation of the simplified build and test pipeline implemented for this Salesforce project.
 
 ## Pipeline Components
 
@@ -10,7 +10,7 @@ This document provides a comprehensive explanation of the CI/CD pipeline impleme
 
 ### 2. Setup Instructions
 - File: `CI-CD-SETUP-INSTRUCTIONS.md`
-- Explains required secrets and configuration steps
+- Explains configuration steps for the build and test pipeline
 
 ## Pipeline Stages
 
@@ -18,22 +18,11 @@ This document provides a comprehensive explanation of the CI/CD pipeline impleme
 - Checks out the source code from the repository
 - Sets up Node.js environment (version 20)
 - Installs Salesforce CLI and Salesforce DX CLI
-- Authenticates with Salesforce Dev Hub using JWT authentication
-- Uses proper authentication flags for security
 
 ### Stage 2: Test
-- Creates a temporary scratch org using the project's definition file
-- Pushes all source code to the scratch org
+- Lints the code for quality and consistency
 - Executes all Apex tests in the project
 - Reports test results
-
-### Stage 3: Deploy (Conditional)
-- If the code is pushed to the `main` branch, deploys to production org
-- Uses the stored production username from secrets
-- Provides detailed logging of deployment process
-
-### Stage 4: Cleanup
-- Always cleans up the scratch org, regardless of success or failure
 
 ## Security Considerations
 
@@ -50,29 +39,27 @@ This document provides a comprehensive explanation of the CI/CD pipeline impleme
 
 ### Robust Execution
 - Each critical step includes `|| exit 1` to ensure pipeline fails fast on errors
-- Proper cleanup occurs even if steps fail
 - Detailed logs are available in GitHub Actions for debugging
 
 ## Branch Strategy
 
 ### Main Branch
-- Triggers full pipeline including production deployment
+- Triggers build and test pipeline
 - Used for stable releases
 
 ### Develop Branch  
-- Triggers testing pipeline only
+- Triggers build and test pipeline only
 - Used for integration and feature development
 
 ### Pull Requests
-- Triggers testing pipeline only
+- Triggers build and test pipeline only
 - Validates changes before merging
 
 ## Prerequisites
 
 ### Salesforce Setup
-1. A Salesforce DX Dev Hub org
+1. A Salesforce DX Dev Hub org (for linting and testing)
 2. A Connected App configured with appropriate permissions
-3. Optional: A production org for deployment
 
 ### GitHub Setup
 1. Repository with write access
@@ -86,8 +73,7 @@ This document provides a comprehensive explanation of the CI/CD pipeline impleme
 ### Available Information
 - Full execution logs in GitHub Actions
 - Test results and coverage reports
-- Scratch org details and URLs
-- Deployment status
+- Code linting results
 
 ### Viewing Results
 1. Navigate to the **Actions** tab in your GitHub repository
@@ -97,16 +83,16 @@ This document provides a comprehensive explanation of the CI/CD pipeline impleme
 ## Best Practices Implemented
 
 ### Automation
-- Fully automated build, test, and deploy processes
+- Fully automated test processes
 - No manual intervention required for standard operations
 
 ### Consistency
 - Standardized environment and execution across all runs
-- Reproducible builds and deployments
+- Reproducible builds and testing
 
 ### Reliability
 - Error handling and graceful degradation
-- Resource cleanup to prevent orphaned environments
+- Comprehensive logging for debugging
 
 ## Customization Options
 
@@ -115,11 +101,4 @@ The workflow file can be customized to:
 - Change trigger conditions
 - Modify test execution parameters
 - Add additional validation steps
-- Include different deployment targets
-
-### Extending Functionality
-Consider adding:
-- Code coverage thresholds
-- Security scanning
-- Performance testing
-- Artifact storage
+- Include code quality checks beyond linting

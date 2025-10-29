@@ -1,13 +1,12 @@
-# CI/CD Pipeline Setup Instructions
+# Build and Test Pipeline Setup Instructions
 
-This document explains how to set up the CI/CD pipeline for this Salesforce project.
+This document explains how to set up the simplified build and test pipeline for this Salesforce project.
 
 ## Overview
 
-The CI/CD pipeline includes three main stages:
+The build and test pipeline includes two main stages:
 1. **Build** - Checks out the code and sets up the environment
-2. **Test** - Creates a scratch org, pushes source code, and runs Apex tests
-3. **Deploy** - Deploys to production org (only on main branch)
+2. **Test** - Lints code and runs Apex tests
 
 ## Required GitHub Secrets
 
