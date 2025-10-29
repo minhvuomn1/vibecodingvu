@@ -1,4 +1,4 @@
-name: Validate Salesforce Project
+name: Salesforce Code Validation
 
 on:
   push:
@@ -11,13 +11,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
     - name: Install Salesforce CLI
       run: npm install -g @salesforce/cli
 
-    - name: Validate SFDX Project
+    - name: Validate Project Structure
       run: |
-        sf project validate
-        sf project deploy validate --source-dir force-app --ignore-errors
+        sf project validate --json
+        sf project convert source --output-dir ./mdapi
+
+    - name: Run Apex Linter
+      run: |
+        npm install -g pmd-bin
+        pmd-bin run --dir force-app --rulesets category/apex/design.xml,category/apex/bestpractices.xml
