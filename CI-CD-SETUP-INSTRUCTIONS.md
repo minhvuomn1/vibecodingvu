@@ -12,13 +12,6 @@ The build and test pipeline includes two main stages:
 
 Before the pipeline can run, you need to configure the following GitHub secrets in your repository settings:
 
-### For Dev Hub Authentication
-- `DEV_HUB_USERNAME` - Your Salesforce DX Dev Hub username
-- `CLIENT_ID` - Your Connected App Client ID
-- `CLIENT_SECRET` - Your Connected App Client Secret (required for JWT auth)
-
-### For Production Deployment (Optional)
-- `PROD_USERNAME` - Your production org username (only needed if deploying to prod)
 
 ## Setting up GitHub Secrets
 
@@ -32,7 +25,7 @@ Before the pipeline can run, you need to configure the following GitHub secrets 
 
 The workflow file `.github/workflows/cicd-pipeline.yml` defines the following jobs:
 
-### Job: build-test-deploy
+### Job: validate
 - Runs on Ubuntu latest runner
 - Checks out the code
 - Sets up Node.js environment

@@ -38,14 +38,6 @@ To create the required Connected App and obtain the necessary credentials:
    - Download the private key (PEM format)
    - Copy the Client ID from the Connected App details
 
-3. **Configure GitHub Repository Secrets:**
-   - Go to your GitHub repository settings
-   - Navigate to "Secrets and variables" → "Actions"
-   - Add the following secrets:
-     - `SALESFORCE_USERNAME`: Your Salesforce username
-     - `SALESFORCE_CLIENT_ID`: The Connected App Client ID
-     - `SAALESFORCE_CLIENT_SECRET`: The Connected App Client Secret
-     - `SALESFORCE_JWT_KEY`: The contents of your private key file (paste the entire PEM content)
 
 ## Workflow Execution
 
