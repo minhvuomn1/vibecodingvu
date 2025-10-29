@@ -27,10 +27,9 @@ jobs:
 
     - name: Authenticate Dev Hub
       run: |
-        echo ${{ secrets.DEV_HUB_USERNAME }} | sfdx force:auth:web:login -d -i ${{ secrets.CLIENT_ID }}
+        sfdx force:auth:web:login -d -i ${{ secrets.CLIENT_ID }} -r ${{ secrets.DEV_HUB_USERNAME }}
       env:
-        DEV_HUB_USERNAME: ${{ secrets.DEV_HUB_USERNAME }}
-        CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        SF_AUTOUPDATE_DISABLE: true
 
     - name: Create Scratch Org
       id: scratchorg

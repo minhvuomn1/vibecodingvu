@@ -37,7 +37,7 @@ The workflow file `.github/workflows/cicd-pipeline.yml` defines the following jo
 - Checks out the code
 - Sets up Node.js environment
 - Installs Salesforce CLI
-- Authenticates with Dev Hub
+- Authenticates with Dev Hub using stored secrets
 - Creates a scratch org
 - Pushes source code to scratch org
 - Runs all Apex tests

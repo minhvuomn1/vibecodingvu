@@ -19,6 +19,7 @@ This document provides a comprehensive explanation of the CI/CD pipeline impleme
 - Sets up Node.js environment (version 20)
 - Installs Salesforce CLI and Salesforce DX CLI
 - Authenticates with Salesforce Dev Hub using stored secrets
+- Uses proper authentication flags for security
 
 ### Stage 2: Test
 - Creates a temporary scratch org using the project's definition file
