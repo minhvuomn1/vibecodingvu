@@ -23,5 +23,5 @@ jobs:
 
     - name: Run Apex Linter
       run: |
-        npm install -g pmd-bin
-        pmd-bin run --dir force-app --rulesets category/apex/design.xml,category/apex/bestpractices.xml
+        npm install -g pmd
+        pmd run --dir force-app --rulesets category/apex/design.xml,category/apex/bestpractices.xml
