@@ -23,6 +23,14 @@ jobs:
       run: |
         npm install -g @salesforce/cli
 
+    - name: Authenticate to Salesforce Org
+      run: |
+        sf org login jwt --username ${{ secrets.SALESFORCE_USERNAME }} \
+          --client-id ${{ secrets.SALESFORCE_CLIENT_ID }} \
+          --client-secret ${{ secrets.SALESFORCE_CLIENT_SECRET }} \
+          --jwt-key-file ${{ secrets.SALESFORCE_JWT_KEY }} \
+          --alias prod-org
+
     - name: Run Apex Tests
       run: |
-        sf apex test run -r human -w 10 -o jeamsont2017350@agentforce.com
+        sf apex test run -r human -w 10 -o prod-org

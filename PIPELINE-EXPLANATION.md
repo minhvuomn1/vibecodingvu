@@ -1,104 +1,71 @@
-# Build and Test Pipeline Explanation
+# CI/CD Pipeline Setup Instructions
 
-This document provides a comprehensive explanation of the simplified build and test pipeline implemented for this Salesforce project.
+This project uses a GitHub Actions workflow for automated building and testing. The workflow is defined in `.github/workflows/cicd-pipeline.yml`.
 
-## Pipeline Components
+## Authentication Setup
 
-### 1. GitHub Actions Workflow
-- File: `.github/workflows/cicd-pipeline.yml`
-- Trigger: Push to `main` or `develop` branches, or pull requests to `main`
+To enable the workflow to connect to your Salesforce Production org, you need to configure the following GitHub Secrets in your repository settings:
 
-### 2. Setup Instructions
-- File: `CI-CD-SETUP-INSTRUCTIONS.md`
-- Explains configuration steps for the build and test pipeline
+### Required Secrets:
+1. `SALESFORCE_USERNAME` - Your Salesforce Production org username
+2. `SALESFORCE_CLIENT_ID` - Your Connected App's Client ID
+3. `SALESFORCE_CLIENT_SECRET` - Your Connected App's Client Secret  
+4. `SALESFORCE_JWT_KEY` - Your Connected App's private key (in PEM format)
 
-## Pipeline Stages
+## Setting Up Connected App for JWT Authentication
 
-### Stage 1: Build
-- Checks out the source code from the repository
-- Sets up Node.js environment (version 20)
-- Installs Salesforce CLI and Salesforce DX CLI
+To create the required Connected App and obtain the necessary credentials:
 
-### Stage 2: Test
-- Lints the code for quality and consistency
-- Executes all Apex tests in the project
-- Reports test results
+1. **In your Salesforce Production org:**
+   - Navigate to Setup → App Manager
+   - Click "New Connected App"
+   - Fill in the required fields:
+     - Connected App Name: `GitHub Actions`
+     - API Name: `GitHub_Actions`
+     - Contact Email: [your email]
+   - Enable OAuth Settings:
+     - Check "Enable OAuth Settings"
+     - Callback URL: `https://login.salesforce.com/`
+     - Selected OAuth Scopes: 
+       - Access and manage your data (api)
+       - Perform requests on your behalf at any time (refresh_token, offline_access)
+       - Provide access to your data via the Web Services API (web)
+   - Click "Save"
 
-## Security Considerations
+2. **Configure Digital Certificate:**
+   - In the Connected App settings, click "Manage" next to "Digital Certificates"
+   - Generate a new certificate
+   - Download the private key (PEM format)
+   - Copy the Client ID from the Connected App details
 
-### Secrets Management
-- All sensitive information (Dev Hub credentials, Production credentials) is stored as GitHub Secrets
-- No credentials are stored in the repository
-- Secrets are accessed securely through GitHub Actions environment variables
+3. **Configure GitHub Repository Secrets:**
+   - Go to your GitHub repository settings
+   - Navigate to "Secrets and variables" → "Actions"
+   - Add the following secrets:
+     - `SALESFORCE_USERNAME`: Your Salesforce username
+     - `SALESFORCE_CLIENT_ID`: The Connected App Client ID
+     - `SAALESFORCE_CLIENT_SECRET`: The Connected App Client Secret
+     - `SALESFORCE_JWT_KEY`: The contents of your private key file (paste the entire PEM content)
 
-### Access Control
-- Only authorized users can modify repository secrets
-- Pipeline runs with minimal required permissions
+## Workflow Execution
 
-## Error Handling
+The workflow will automatically trigger on:
+- Push events to `main` or `develop` branches
+- Pull request events targeting the `main` branch
 
-### Robust Execution
-- Each critical step includes `|| exit 1` to ensure pipeline fails fast on errors
-- Detailed logs are available in GitHub Actions for debugging
+## Testing the Setup
 
-## Branch Strategy
+To verify the workflow works correctly:
+1. Commit and push your changes to the repository
+2. Visit the "Actions" tab in your GitHub repository
+3. The workflow should automatically start
+4. Monitor the execution logs to ensure authentication and test execution succeed
 
-### Main Branch
-- Triggers build and test pipeline
-- Used for stable releases
+## Alternative: Using Scratch Orgs
 
-### Develop Branch  
-- Triggers build and test pipeline only
-- Used for integration and feature development
+If you prefer to use a scratch org instead of the production org, you can modify the workflow to:
+1. Create a scratch org using `sf org create scratch`
+2. Run tests against the scratch org
+3. Delete the scratch org after testing
 
-### Pull Requests
-- Triggers build and test pipeline only
-- Validates changes before merging
-
-## Prerequisites
-
-### Salesforce Setup
-1. A Salesforce DX Dev Hub org (for linting and testing)
-2. A Connected App configured with appropriate permissions
-
-### GitHub Setup
-1. Repository with write access
-2. Required secrets configured in repository settings:
-   - `DEV_HUB_USERNAME`
-   - `CLIENT_ID` 
-   - `PROD_USERNAME` (optional)
-
-## Monitoring and Logging
-
-### Available Information
-- Full execution logs in GitHub Actions
-- Test results and coverage reports
-- Code linting results
-
-### Viewing Results
-1. Navigate to the **Actions** tab in your GitHub repository
-2. Select the workflow run to view detailed logs
-3. Check individual step results for troubleshooting
-
-## Best Practices Implemented
-
-### Automation
-- Fully automated test processes
-- No manual intervention required for standard operations
-
-### Consistency
-- Standardized environment and execution across all runs
-- Reproducible builds and testing
-
-### Reliability
-- Error handling and graceful degradation
-- Comprehensive logging for debugging
-
-## Customization Options
-
-### Modifying the Pipeline
-The workflow file can be customized to:
-- Change trigger conditions
-- Modify test execution parameters
-- Add additional validation steps
-- Include code quality checks beyond linting
+This approach is often preferred for CI/CD as it provides a clean, isolated environment for each test run.
