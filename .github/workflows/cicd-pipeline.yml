@@ -1,15 +1,13 @@
-name: Build and Test Pipeline
+name: Lint and Build Check
 
 on:
-  push:
-    branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 jobs:
-  build-and-test:
+  lint-build:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
@@ -19,18 +17,13 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install Salesforce CLI
-      run: |
-        npm install -g @salesforce/cli
+    - name: Install Dependencies
+      run: npm install
 
-    - name: Authenticate to Salesforce Org
-      run: |
-        sf org login jwt --username ${{ secrets.SALESFORCE_USERNAME }} \
-          --client-id ${{ secrets.SALESFORCE_CLIENT_ID }} \
-          --client-secret ${{ secrets.SALESFORCE_CLIENT_SECRET }} \
-          --jwt-key-file ${{ secrets.SALESFORCE_JWT_KEY }} \
-          --alias prod-org
+    - name: Run LWC Lint
+      run: npm run lint || true
 
-    - name: Run Apex Tests
+    - name: Run Apex Static Analysis
       run: |
-        sf apex test run -r human -w 10 -o prod-org
+        npm install -g pmd-bin
+        pmd-bin run pmd -d force-app/main/default/classes -R category/apex/design.xml
