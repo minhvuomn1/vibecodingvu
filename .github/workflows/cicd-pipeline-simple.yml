@@ -29,7 +29,7 @@ jobs:
       run: |
         echo "Authenticating to Dev Org using SFDX AUTH URL..."
         echo "${{ secrets.SFDX_AUTH_URL }}" > sfdx_auth.txt
-        sf auth sfdx-url store --sfdx-url-file sfdx_auth.txt --alias hellovibe-dev --set-default
+        sf org login sfdx-url --sfdx-url-file sfdx_auth.txt --alias hellovibe-dev --set-default
         sf org display --target-org hellovibe-dev
     - name: Get Current Commit Hash
       id: get_commit
