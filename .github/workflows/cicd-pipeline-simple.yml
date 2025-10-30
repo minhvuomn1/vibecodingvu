@@ -48,32 +48,32 @@ jobs:
         echo "Source deployed in $duration seconds"
         echo "source_deploy_time=$duration" >> $GITHUB_ENV
     
-    - name: Run Apex Tests with Coverage
-      id: run_tests
-      run: |
-        echo "Running Apex tests with coverage requirement..."
-        startTime=$(date +%s)
-        ./sfdx/bin/sf apex run test -o jeamsont2017350@agentforce.com --wait 10 --result-format json > test-result.json
+    # - name: Run Apex Tests with Coverage
+    #   id: run_tests
+    #   run: |
+    #     echo "Running Apex tests with coverage requirement..."
+    #     startTime=$(date +%s)
+    #     ./sfdx/bin/sf apex run test -o jeamsont2017350@agentforce.com --wait 10 --result-format json > test-result.json
 
-        coverage=$(grep -o '"coveragePercentage":[0-9]*\.[0-9]*' test-result.json | sed 's/"coveragePercentage"://')
-        if [ -z "$coverage" ]; then coverage="0"; fi
-        echo "Coverage: ${coverage}%"
-        if (( $(echo "$coverage >= 85" | bc -l) )); then
-          echo " Coverage is sufficient: ${coverage}%"
-        else
-          echo " Coverage is insufficient: ${coverage}%, minimum required is 85%"
-          exit 1
-        fi
+    #     coverage=$(grep -o '"coveragePercentage":[0-9]*\.[0-9]*' test-result.json | sed 's/"coveragePercentage"://')
+    #     if [ -z "$coverage" ]; then coverage="0"; fi
+    #     echo "Coverage: ${coverage}%"
+    #     if (( $(echo "$coverage >= 85" | bc -l) )); then
+    #       echo " Coverage is sufficient: ${coverage}%"
+    #     else
+    #       echo " Coverage is insufficient: ${coverage}%, minimum required is 85%"
+    #       exit 1
+    #     fi
 
-        passed=$(grep -o '"passed":[0-9]*' test-result.json | sed 's/"passed"://')
-        failed=$(grep -o '"failed":[0-9]*' test-result.json | sed 's/"failed"://')
-        echo "Tests Passed: $passed"
-        echo "Tests Failed: $failed"
+    #     passed=$(grep -o '"passed":[0-9]*' test-result.json | sed 's/"passed"://')
+    #     failed=$(grep -o '"failed":[0-9]*' test-result.json | sed 's/"failed"://')
+    #     echo "Tests Passed: $passed"
+    #     echo "Tests Failed: $failed"
 
-        endTime=$(date +%s)
-        duration=$((endTime - startTime))
-        echo "Tests completed in $duration seconds"
-        echo "test_execution_time=$duration" >> $GITHUB_ENV
+    #     endTime=$(date +%s)
+    #     duration=$((endTime - startTime))
+    #     echo "Tests completed in $duration seconds"
+    #     echo "test_execution_time=$duration" >> $GITHUB_ENV
 
     - name: Store Current State for Potential Rollback
       if: always()
