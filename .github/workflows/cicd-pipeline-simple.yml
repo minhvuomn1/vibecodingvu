@@ -5,9 +5,6 @@ on:
   pull_request:
     branches: [ main ]
 
-permissions:
-  contents: write
-  
 jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
@@ -94,8 +91,13 @@ jobs:
         echo "Current commit hash: ${{ env.commit_hash }}"
     - name: Rollback on Deployment Failure
       if: failure() && steps.deploy_source.outcome == 'failure'
+      env:
+        TOKEN: ${{ secrets.PAT_TOKEN }}
       run: |
         echo "Rolling back last commit..."
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+        git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git
         git reset --hard HEAD~1
         git push --force
     - name: Summarize Metrics and Log Execution Times
