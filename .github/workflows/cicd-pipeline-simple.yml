@@ -4,7 +4,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-
+permissions:
+  contents: write
 jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
@@ -83,7 +84,14 @@ jobs:
     #     duration=$((endTime - startTime))
     #     echo "Tests completed in $duration seconds"
     #     echo "test_execution_time=$duration" >> $GITHUB_ENV
-
+    - name: Debug Token
+      run: |
+        if [ -z "${{ secrets.PAT_TOKEN }}" ]; then
+          echo "❌ PAT_TOKEN is empty!"
+          exit 1
+        else
+          echo "✅ PAT_TOKEN loaded successfully (hidden)"
+        fi
     - name: Store Current State for Potential Rollback
       if: always()
       run: |

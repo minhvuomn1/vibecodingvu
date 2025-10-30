@@ -5,17 +5,22 @@ public with sharing class TodoController {
         return [
             SELECT Id, Name, Completed__c, CreatedDate
             FROM Todo__c
-            ORDER BY Completed__c ASC, CreatedDate DESCÁDFDSA
-        ];
+            ORDER BY Completed__c ASC, CreatedDate DESC
+            LIMIT 200
+        ];CSACAS
     }
-DSAFFDSAFFDAS
+
+    @AuraEnabledCSA
+    public static Todo__c markComplete(Id recordId) {
+        if (recordId == null) {
             throw new AuraHandledException('recordId is required');
         }
         Todo__c t = [SELECT Id, Completed__c FROM Todo__c WHERE Id = :recordId LIMIT 1];
         if (t.Completed__c == true) {
-            return t;FDSA
-        t.Completed__c = true;DÁ
-        update t;SFSDAF
-        return t;F
+            return t;
+        }
+        t.Completed__c = true;
+        update t;
+        return t;
+    }
 }
-DSADÁF
