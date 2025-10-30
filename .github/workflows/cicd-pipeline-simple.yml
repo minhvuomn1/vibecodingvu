@@ -27,7 +27,7 @@ jobs:
 
     - name: Convert Source to Metadata Format
       run: |
-        sf project convert source --output-dir ./mdapi --verbose
+        sf project convert source --output-dir ./mdapi
 
     - name: Run Syntax Check
       run: |

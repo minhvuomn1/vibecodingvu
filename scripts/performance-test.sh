@@ -6,7 +6,7 @@ echo "Starting metadata generation performance test..."
 START_TIME=$(date +%s.%N)
 
 echo "Converting source to metadata format..."
-sf project convert source --output-dir ./mdapi-perf --verbose
+sf project convert source --output-dir ./mdapi-perf
 
 END_TIME=$(date +%s.%N)
 ELAPSED_TIME=$(echo "$END_TIME - $START_TIME" | bc)
@@ -39,7 +39,7 @@ echo "Testing with different output formats..."
 
 # Test with --source-dir parameter
 START_TIME=$(date +%s.%N)
-sf project convert source --source-dir force-app --output-dir ./mdapi-source-dir --verbose
+sf project convert source --source-dir force-app --output-dir ./mdapi-source-dir
 END_TIME=$(date +%s.%N)
 ELAPSED_TIME_SOURCE_DIR=$(echo "$END_TIME - $START_TIME" | bc)
 echo "With --source-dir: ${ELAPSED_TIME_SOURCE_DIR} seconds"
