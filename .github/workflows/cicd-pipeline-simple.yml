@@ -4,8 +4,10 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
 permissions:
   contents: write
+
 jobs:
   build-test-deploy:
     runs-on: ubuntu-latest
@@ -49,7 +51,7 @@ jobs:
         set -e
         echo ":rocket: Deploying source to Dev Org..."
         startTime=$(date +%s)
-        ./sfdx/bin/sf project deploy start --source-dir force-app --target-org hellovibe-dev --ignore-conflicts --wait 10
+        sf project deploy start --source-dir force-app --target-org hellovibe-dev --ignore-conflicts --wait 10
         endTime=$(date +%s)
         duration=$((endTime - startTime))
         echo ":white_check_mark: Deployment completed in $duration seconds"
@@ -92,7 +94,7 @@ jobs:
         git restore --staged .github/workflows/pipeline.yml || true
         git push origin main --force
         echo ":repeat: Restoring previous metadata to org..."
-        ./sfdx/bin/sf project deploy start --source-dir backups/previous --target-org hellovibe-dev --ignore-conflicts --wait 10
+        sf project deploy start --source-dir backups/previous --target-org hellovibe-dev --ignore-conflicts --wait 10
         echo ":white_check_mark: Rollback completed successfully."
         
     - name: Summarize Metrics and Log Execution Times
