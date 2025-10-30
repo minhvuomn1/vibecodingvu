@@ -91,7 +91,7 @@ jobs:
         echo ":x: Deployment failed — initiating rollback..."
         echo ":arrows_counterclockwise: Reverting GitHub to previous commit (excluding workflow files)..."
         git reset --hard HEAD~1
-        git restore --staged .github/workflows/pipeline.yml || true
+        git restore --staged .github/workflows/cicd-pipeline-simple.yml || true
         git push origin main --force
         echo ":repeat: Restoring previous metadata to org..."
         sf project deploy start --source-dir backups/previous --target-org hellovibe-dev --ignore-conflicts --wait 10
