@@ -18,31 +18,35 @@ jobs:
         node-version: '20'
     - name: Install Salesforce CLI
       run: |
-        curl https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz | tar xJf -
-        ./sfdx/bin/sfdx --version
-    - name: Install Salesforce CLI Plugins (npm method)
+        npm install --global @salesforce/cli
+        sf --version
+    - name: Install Salesforce CLI Plugins
       run: |
-        echo "Installing Salesforce CLI Plugins via npm..."
-        npm install -g @salesforce/plugin-source @salesforce/plugin-apex
-        ./sfdx/bin/sfdx plugins --core
+        echo "Installing Salesforce CLI Plugins..."
+        sf plugins install @salesforce/plugin-source @salesforce/plugin-apex
+        sf plugins --core
     - name: Authenticate to Salesforce Dev Org using SFDX URL
       run: |
         echo "Authenticating to Dev Org using SFDX AUTH URL..."
         echo "${{ secrets.SFDX_AUTH_URL }}" > sfdx_auth.txt
-        ./sfdx/bin/sfdx auth:sfdxurl:store -f sfdx_auth.txt --set-default --alias hellovibe-dev
-        ./sfdx/bin/sfdx org display --target-org hellovibe-dev
+        sf auth sfdx-url store --sfdx-url-file sfdx_auth.txt --alias hellovibe-dev --set-default
+        sf org display --target-org hellovibe-dev
     - name: Get Current Commit Hash
       id: get_commit
       run: |
         COMMIT_HASH=$(git rev-parse HEAD)
         echo "commit_hash=$COMMIT_HASH" >> $GITHUB_ENV
         echo "Current commit: $COMMIT_HASH"
+    - name: Measure Convert (sf project:source:convert)
+      id: convert_measure
+      run: |
+        node scripts/measureStep.js "sf project:source:convert (mdapi out)" -- sf project:source:convert --output-dir mdapi
     - name: Deploy Source to Dev Org
       id: deploy_source
       run: |
         echo "Deploying source to Dev Org..."
         startTime=$(date +%s)
-        ./sfdx/bin/sfdx force:source:deploy -p force-app --targetusername jeamsont2017350@agentforce.com 
+        sf project deploy start --source-dir force-app --target-org hellovibe-dev --ignore-conflicts
         endTime=$(date +%s)
         duration=$((endTime - startTime))
         echo "Source deployed in $duration seconds"
@@ -87,9 +91,26 @@ jobs:
         echo "In real project, this would revert to the previous commit."
         git revert ${{ env.commit_hash }} --no-edit || true
         git push || true
-    - name: Log Execution Times
+    - name: Summarize Metrics and Log Execution Times
       run: |
         echo "=== Pipeline Execution Summary ==="
         echo "Source Deployment: ${{ env.source_deploy_time }} seconds"
         echo "Test Execution: ${{ env.test_execution_time }} seconds"
         echo "Commit Hash: ${{ env.commit_hash }}"
+        echo ""
+        echo "=== Vibe Metrics (today) ==="
+        TODAY=$(date +"%Y-%m-%d")
+        LOG="VibeWorkflowLogs/${TODAY}-workflow-log.md"
+        if [ -f "$LOG" ]; then
+          # Extract JSON lines printed by measureStep
+          METRICS=$(grep "__VIBE_METRIC__" "$LOG" | sed 's/__VIBE_METRIC__ //')
+          echo "$METRICS" | node -e 'let lines="";process.stdin.on("data",d=>lines+=d);process.stdin.on("end",()=>{const arr=lines.trim().split(/\r?\n/).filter(Boolean).map(JSON.parse);if(arr.length===0){console.log("No metrics.");return;}const convert=arr.filter(x=>x.step.includes("project:source:convert"));const avg=convert.length?Math.round(convert.reduce((a,b)=>a+b.durationMs,0)/convert.length):0;const errors=convert.filter(x=>x.exitCode!==0).length;console.log(`Convert count: ${convert.length}`);console.log(`Average duration: ${avg} ms`);console.log(`Errors: ${errors}`);});'
+        else
+          echo "No VibeWorkflowLogs found for today."
+        fi
+    - name: Upload VibeWorkflowLogs artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: VibeWorkflowLogs
+        path: VibeWorkflowLogs/
