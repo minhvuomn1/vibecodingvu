@@ -42,29 +42,18 @@ jobs:
     - name: Measure Convert (sf project:source:convert)
       id: convert_measure
       run: |
-        node scripts/measureStep.js "sf project:source:convert (mdapi out)" -- sf project:source:convert --output-dir mdapi
-    - name: Debug Token
-      run: |
-        if [ -z "${{ secrets.PAT_TOKEN }}" ]; then
-          echo " PAT_TOKEN is empty!"
-          exit 1
-        else
-          echo " PAT_TOKEN loaded successfully (hidden)"
-        fi    
+        node scripts/measureStep.js "sf project:source:convert (mdapi out)" -- sf project:source:convert --output-dir mdapi    
     - name: Deploy Source to Dev Org
       id: deploy_source
       run: |
-        echo "Deploying source to Dev Org..."
+        set -e
+        echo ":rocket: Deploying source to Dev Org..."
         startTime=$(date +%s)
-        if sf project deploy start --source-dir force-app --target-org hellovibe-dev --ignore-conflicts; then
-          endTime=$(date +%s)
-          duration=$((endTime - startTime))
-          echo "Source deployed in $duration seconds"
-          echo "source_deploy_time=$duration" >> $GITHUB_ENV
-        else
-          echo "Deployment failed"
-          exit 1
-        fi
+        ./sfdx/bin/sf project deploy start --source-dir force-app --target-org hellovibe-dev --ignore-conflicts --wait 10
+        endTime=$(date +%s)
+        duration=$((endTime - startTime))
+        echo ":white_check_mark: Deployment completed in $duration seconds"
+        echo "source_deploy_time=$duration" >> $GITHUB_ENV
     
     # - name: Run Apex Tests with Coverage
     #   id: run_tests
@@ -93,22 +82,19 @@ jobs:
     #     echo "Tests completed in $duration seconds"
     #     echo "test_execution_time=$duration" >> $GITHUB_ENV
 
-    - name: Store Current State for Potential Rollback
-      if: always()
-      run: |
-        echo "Storing current state for potential rollback..."
-        echo "Current commit hash: ${{ env.commit_hash }}"
     - name: Rollback on Deployment Failure
-      if: failure() && steps.deploy_source.outcome == 'failure'
-      env:
-        TOKEN: ${{ secrets.PAT_TOKEN }}
+      if: failure()
       run: |
-        echo "Rolling back last commit..."
-        git config --global user.email "action@github.com"
-        git config --global user.name "GitHub Action"
-        git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git
+        set -e
+        echo ":x: Deployment failed — initiating rollback..."
+        echo ":arrows_counterclockwise: Reverting GitHub to previous commit (excluding workflow files)..."
         git reset --hard HEAD~1
-        git push --force
+        git restore --staged .github/workflows/pipeline.yml || true
+        git push origin main --force
+        echo ":repeat: Restoring previous metadata to org..."
+        ./sfdx/bin/sf project deploy start --source-dir backups/previous --target-org hellovibe-dev --ignore-conflicts --wait 10
+        echo ":white_check_mark: Rollback completed successfully."
+        
     - name: Summarize Metrics and Log Execution Times
       run: |
         echo "=== Pipeline Execution Summary ==="
