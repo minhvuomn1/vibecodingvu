@@ -43,6 +43,14 @@ jobs:
       id: convert_measure
       run: |
         node scripts/measureStep.js "sf project:source:convert (mdapi out)" -- sf project:source:convert --output-dir mdapi
+    - name: Debug Token
+      run: |
+        if [ -z "${{ secrets.PAT_TOKEN }}" ]; then
+          echo " PAT_TOKEN is empty!"
+          exit 1
+        else
+          echo " PAT_TOKEN loaded successfully (hidden)"
+        fi    
     - name: Deploy Source to Dev Org
       id: deploy_source
       run: |
@@ -84,14 +92,7 @@ jobs:
     #     duration=$((endTime - startTime))
     #     echo "Tests completed in $duration seconds"
     #     echo "test_execution_time=$duration" >> $GITHUB_ENV
-    - name: Debug Token
-      run: |
-        if [ -z "${{ secrets.PAT_TOKEN }}" ]; then
-          echo "❌ PAT_TOKEN is empty!"
-          exit 1
-        else
-          echo "✅ PAT_TOKEN loaded successfully (hidden)"
-        fi
+
     - name: Store Current State for Potential Rollback
       if: always()
       run: |
