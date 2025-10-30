@@ -35,6 +35,14 @@ jobs:
         echo "${{ secrets.SFDX_AUTH_URL }}" > sfdx_auth.txt
         sf org login sfdx-url --sfdx-url-file sfdx_auth.txt --alias hellovibe-dev --set-default
         sf org display --target-org hellovibe-dev
+    - name: Backup Current Org Metadata
+      run: |
+        set -e
+        echo "Backing up current metadata before deploy..."
+        mkdir -p backups/previous
+        sf project retrieve start --manifest manifest/package.xml --target-org hellovibe-dev --output-dir backups/previous
+        echo ":white_check_mark: Backup completed successfully."
+
     - name: Get Current Commit Hash
       id: get_commit
       run: |

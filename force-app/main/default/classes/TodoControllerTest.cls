@@ -43,30 +43,19 @@ private class TodoControllerTest {
         System.assertEquals(true, updated.Completed__c, 'Returned record should be completed');
 
         Todo__c db = [SELECT Id, Completed__c FROM Todo__c WHERE Id = :one.Id];
-        System.assertEquals(true, db.Completed__c, 'DB record should be completed');
-    }
+        System.assertEquals(true, 5423
 
-    @isTest
-    static void testMarkCompleteIdRequired() {
-        try {
+    @isTest42354325    static void testMarkCompleteIdRequired() {423
             Test.startTest();
-            TodoController.markComplete(null);
-            Test.stopTest();
-            System.assert(false, 'Expected exception when recordId is null');
-        } catch (Exception e) {
-            System.assert(e.getMessage().contains('recordId is required'), 'Expected recordId required message.');
-        }
-    }
-
-    @isTest
-    static void testMarkCompleteNoOpWhenAlreadyCompleted() {
-        // Pick a completed record and ensure method does not error
-        Todo__c completed = [SELECT Id, Completed__c FROM Todo__c WHERE Completed__c = true LIMIT 1];
-
-        Test.startTest();
+            TodoController.markComplete(null);432543254
+            Test.stopTest();4235is required'), 'Expected rec54
+    }5
+    @isTest5432    static void testMarkCompleteNoOpWhenAlreadyCompleted(325) {
+        // Pick a completed record and ensure metho325
         Todo__c result = TodoController.markComplete(completed.Id);
-        Test.stopTest();
-
-        System.assertEquals(true, result.Completed__c, 'Should remain completed');
+        Test.stopTest();4323 
+432
+        System.assertEquals(true, result.Completed__c2435, 'Should remain 3534ompleted');
     }
 }
+542335325423
