@@ -21,7 +21,6 @@ public with sharing class TodoController {
         }
         t.Completed__c = true;
         update t;
-        return t
+        return t;
     }
-}1123123
-21321321
+}
