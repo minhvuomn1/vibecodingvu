@@ -1,63 +1,90 @@
-name: Simple Salesforce CI/CD Pipeline
-
+name: HelloVibe CI/CD Pipeline
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
-
 jobs:
-  validate:
+  build-test-deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-
     - name: Install Salesforce CLI
-      run: npm install -g @salesforce/cli
-
-    - name: Validate Project Structure
       run: |
-        sf project validate --json
-
-    - name: Convert Source to Metadata Format
+        curl https://developer.salesforce.com/media/salesforce-cli/sfdx/channels/stable/sfdx-linux-x64.tar.xz | tar xJf -
+        ./sfdx/bin/sfdx --version
+    - name: Install Salesforce CLI Plugins (npm method)
       run: |
-        sf project convert source --output-dir ./mdapi
-
-    - name: Run Syntax Check
+        echo "Installing Salesforce CLI Plugins via npm..."
+        npm install -g @Salesforce/plugin-source @Salesforce/plugin-apex
+        ./sfdx/bin/sfdx plugins --core
+    - name: Authenticate to Salesforce Dev Org using SFDX URL
       run: |
-        # Check for syntax errors in Apex classes and triggers
-        find force-app -name "*.cls" -o -name "*.trigger" | while read file; do
-          echo "Checking $file"
-          # Simple syntax check - we can expand this as needed
-          if [ -f "$file" ]; then
-            echo "Syntax check passed for $file"
-          fi
-        done
-
-    - name: Run Linting
+        echo "Authenticating to Dev Org using SFDX AUTH URL..."
+        echo "${{ secrets.SFDX_AUTH_URL }}" > sfdx_auth.txt
+        ./sfdx/bin/sfdx auth:sfdxurl:store -f sfdx_auth.txt --set-default --alias hellovibe-dev
+        ./sfdx/bin/sfdx org display --target-org hellovibe-dev
+    - name: Get Current Commit Hash
+      id: get_commit
       run: |
-        # Try to run security and style checks if sfdx-scanner is available
-        if command -v sfdx &> /dev/null; then
-          echo "Running security and style checks..."
-          sfdx scanner:run --target force-app --format json --output-file scanner-results.json || echo "Scanner completed with issues"
+        COMMIT_HASH=$(git rev-parse HEAD)
+        echo "commit_hash=$COMMIT_HASH" >> $GITHUB_ENV
+        echo "Current commit: $COMMIT_HASH"
+    - name: Deploy Source to Dev Org
+      id: deploy_source
+      run: |
+        echo "Deploying source to Dev Org..."
+        startTime=$(date +%s)
+        ./sfdx/bin/sfdx force:source:deploy -p force-app --targetusername jeamsont2017350@agentforce.com 
+        endTime=$(date +%s)
+        duration=$((endTime - startTime))
+        echo "Source deployed in $duration seconds"
+        echo "source_deploy_time=$duration" >> $GITHUB_ENV
+        - name: Run Apex Tests with Coverage
+          id: run_tests
+          run: |
+            echo "Running Apex tests with coverage requirement..."
+            startTime=$(date +%s)
+            ./sfdx/bin/sf apex run test -o jeamsont2017350@agentforce.com  --wait 10 --result-format json > test-result.json
+        coverage=$(grep -o '"coveragePercentage":[0-9]*\.[0-9]*' test-result.json | sed 's/"coveragePercentage":"//; s/"//')
+        if [ -z "$coverage" ]; then coverage="0"; fi
+        echo "Coverage: ${coverage}%"
+        if (( $(echo "$coverage >= 85" | bc -l) )); then
+          echo ":white_check_mark: Coverage is sufficient: ${coverage}%"
         else
-          echo "sfdx-scanner not available, skipping linting checks"
+          echo ":x: Coverage is insufficient: ${coverage}%, minimum required is 85%"
+          exit 1
         fi
-
-    - name: Run Apex Tests
+        passed=$(grep -o '"passed":[0-9]*' test-result.json | sed 's/"passed"://')
+        failed=$(grep -o '"failed":[0-9]*' test-result.json | sed 's/"failed"://')
+        echo "Tests Passed: $passed"
+        echo "Tests Failed: $failed"
+        endTime=$(date +%s)
+        duration=$((endTime - startTime))
+        echo "Tests completed in $duration seconds"
+        echo "test_execution_time=$duration" >> $GITHUB_ENV
+    - name: Store Current State for Potential Rollback
+      if: always()
       run: |
-        # Skip Apex tests as we don't need org authentication
-        echo "Skipping Apex tests (no org authentication required)"
-
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: mdapi-output
-        path: ./mdapi/
-        retention-days: 30
+        echo "Storing current state for potential rollback..."
+        echo "Current commit hash: ${{ env.commit_hash }}"
+    - name: Rollback on Deployment Failure
+      if: failure()
+      run: |
+        echo "Deployment failed, initiating rollback procedure..."
+        echo "In real project, this would revert to the previous commit."
+        git revert ${{ env.commit_hash }} --no-edit || true
+        git push || true
+    - name: Log Execution Times
+      run: |
+        echo "=== Pipeline Execution Summary ==="
+        echo "Source Deployment: ${{ env.source_deploy_time }} seconds"
+        echo "Test Execution: ${{ env.test_execution_time }} seconds"
+        echo "Commit Hash: ${{ env.commit_hash }}"
