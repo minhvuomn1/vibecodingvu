@@ -47,17 +47,7 @@ jobs:
         duration=$((endTime - startTime))
         echo "Source deployed in $duration seconds"
         echo "source_deploy_time=$duration" >> $GITHUB_ENV
-    - name: Deploy Source to Dev Org
-      id: deploy_source
-      run: |
-        echo "Deploying source to Dev Org..."
-        startTime=$(date +%s)
-        ./sfdx/bin/sfdx force:source:deploy -p force-app --target-org jeamsont2017350@agentforce.com
-        endTime=$(date +%s)
-        duration=$((endTime - startTime))
-        echo "Source deployed in $duration seconds"
-        echo "source_deploy_time=$duration" >> $GITHUB_ENV
-
+    
     - name: Run Apex Tests with Coverage
       id: run_tests
       run: |
