@@ -46,11 +46,15 @@ jobs:
       run: |
         echo "Deploying source to Dev Org..."
         startTime=$(date +%s)
-        sf project deploy start --source-dir force-app --target-org hellovibe-dev --ignore-conflicts
-        endTime=$(date +%s)
-        duration=$((endTime - startTime))
-        echo "Source deployed in $duration seconds"
-        echo "source_deploy_time=$duration" >> $GITHUB_ENV
+        if sf project deploy start --source-dir force-app --target-org hellovibe-dev --ignore-conflicts; then
+          endTime=$(date +%s)
+          duration=$((endTime - startTime))
+          echo "Source deployed in $duration seconds"
+          echo "source_deploy_time=$duration" >> $GITHUB_ENV
+        else
+          echo "Deployment failed"
+          exit 1
+        fi
     
     # - name: Run Apex Tests with Coverage
     #   id: run_tests
@@ -85,12 +89,11 @@ jobs:
         echo "Storing current state for potential rollback..."
         echo "Current commit hash: ${{ env.commit_hash }}"
     - name: Rollback on Deployment Failure
-      if: failure()
+      if: failure() && steps.deploy_source.outcome == 'failure'
       run: |
-        echo "Deployment failed, initiating rollback procedure..."
-        echo "In real project, this would revert to the previous commit."
-        git revert ${{ env.commit_hash }} --no-edit || true
-        git push || true
+        echo "Rolling back last commit..."
+        git reset --hard HEAD~1
+        git push --force
     - name: Summarize Metrics and Log Execution Times
       run: |
         echo "=== Pipeline Execution Summary ==="
