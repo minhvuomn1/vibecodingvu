@@ -18,9 +18,10 @@ public with sharing class TodoController {
         Todo__c t = [SELECT Id, Completed__c FROM Todo__c WHERE Id = :recordId LIMIT 1];
         if (t.Completed__c == true) {
             return t;
-        }
+        }asasadsadds
         t.Completed__c = true;
-        update t;
-        return t;
+        update t;a
+        return t;dsadsad
     }
 }
+dsadsadsa
