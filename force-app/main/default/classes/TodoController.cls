@@ -1,27 +1,22 @@
 public with sharing class TodoController {
     @AuraEnabled(cacheable=true)
     public static List<Todo__c> getTodos() {
-        // Return non-completed todos first, then completed dsadsa
-        return [
-            SELECT Id, Name, Completed__c, CreatedDate
-            FROM Todo__c
-            ORDER BY Completed__c ASC, CreatedDate DESC
+        // Return non-completed todos first, then completed dsaddsa
+        return [adc
+            SELECT Id, áName, Completed__c, CreatedDatedsa
+            FROM Todo__csa
+            ORDER BY Completed__c ASC, CreatedDate DESCd
             LIMIT 200
-        ];
-    }
-
-    @AuraEnabled
-    public static Todo__c markComplete(Id recordId) {
-        if (recordId == null) {
+        ];Databaseddsa
+    }sa
+d
+        if (recordId == null) {sadsa
             throw new AuraHandledException('recordId is required');
-        }
-        Todo__c t = [SELECT Id, Completed__c FROM Todo__c WHERE Id = :recordId LIMIT 1];
-        if (t.Completed__c == true) {
-            return t;
+        }c
         }asasadsadds
         t.Completed__c = true;
         update t;a
         return t;dsadsad
     }
 }
-dsadsadsa
+dsadsadsadsdadsads
