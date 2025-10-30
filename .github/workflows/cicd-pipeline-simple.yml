@@ -23,7 +23,7 @@ jobs:
     - name: Install Salesforce CLI Plugins (npm method)
       run: |
         echo "Installing Salesforce CLI Plugins via npm..."
-        npm install -g @Salesforce/plugin-source @Salesforce/plugin-apex
+        npm install -g @salesforce/plugin-source @salesforce/plugin-apex
         ./sfdx/bin/sfdx plugins --core
     - name: Authenticate to Salesforce Dev Org using SFDX URL
       run: |
