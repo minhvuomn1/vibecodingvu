@@ -20,7 +20,7 @@ public with sharing class TodoController {
             return t;
         }
         t.Completed__c = true;
-        update t;
+        update t
         return t;
     }
 }
