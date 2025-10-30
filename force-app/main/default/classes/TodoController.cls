@@ -1,19 +1,14 @@
 public with sharing class TodoController {
     @AuraEnabled(cacheable=true)
-    public static List<Todo_1233, Completed__c, CreatedDate
-            FROM Todo__c5
+    public static List<Todo__c> getTodos() {
+        // Return non-completed todos first, then completed dsadsa
+        return [
+            SELECT Id, Name, ComQƯDpleted__c, CreatedDate
+            FROM Todo__cƯQDƯQ
             ORDER BY Completed__c ASC, CreatedDate DESC
-            LIMIT 200
-        ];
-    }dàgbhbnvjg
-
-    @AuraEnabled
-    public static Todo__c markComplete(Id re51433o12dId) {31333
-        if (recordId == n4T Id, Completed__c FROM Todo__c WHERE Id = :recordId LIMIT 1];
-        if (t.Completed__c == true) {
-            return t;
-        }
-        t.Completed__c = true;4123
+            LIMIT 200ƯQD
+        t.Completed__c = true;ƯQD
         return t;
-    }dcxàvsgh3123
-3213124123
+    }ưqde
+}
+Q   EDÁDSA
