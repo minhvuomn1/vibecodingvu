@@ -1,4 +1,4 @@
-@IsTest
+@isTest
 private class TodoControllerTest {
     @TestSetup
     static void setupData() {
@@ -12,7 +12,7 @@ private class TodoControllerTest {
         insert todos;
     }
 
-    @IsTest
+    @isTest
     static void testGetTodosOrdersIncompleteFirst() {
         Test.startTest();
         List<Todo__c> results = TodoController.getTodos();
@@ -31,7 +31,7 @@ private class TodoControllerTest {
         }
     }
 
-    @IsTest
+    @isTest
     static void testMarkCompleteSetsFlagTrue() {
         // Get an incomplete todo
         Todo__c one = [SELECT Id, Completed__c FROM Todo__c WHERE Completed__c = false LIMIT 1];
@@ -46,7 +46,7 @@ private class TodoControllerTest {
         System.assertEquals(true, db.Completed__c, 'DB record should be completed');
     }
 
-    @IsTest
+    @isTest
     static void testMarkCompleteIdRequired() {
         try {
             Test.startTest();
@@ -58,7 +58,7 @@ private class TodoControllerTest {
         }
     }
 
-    @IsTest
+    @isTest
     static void testMarkCompleteNoOpWhenAlreadyCompleted() {
         // Pick a completed record and ensure method does not error
         Todo__c completed = [SELECT Id, Completed__c FROM Todo__c WHERE Completed__c = true LIMIT 1];
