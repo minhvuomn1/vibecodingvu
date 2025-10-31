@@ -7,10 +7,10 @@ public with sharing class TodoController {
             FROM Todo__c
             ORDER BY Completed__c ASC, CreatedDate DESC
             LIMIT 200
-        ];sad
+        ];
     }
 
-    @AuraEnableddsadsa
+    @AuraEnabled
     public static Todo__c markComplete(Id recordId) {
         if (recordId == null) {
             throw new AuraHandledException('recordId is required');
@@ -18,9 +18,9 @@ public with sharing class TodoController {
         Todo__c t = [SELECT Id, Completed__c FROM Todo__c WHERE Id = :recordId LIMIT 1];
         if (t.Completed__c == true) {
             return t;
-        }sa
-        t.Completed__c = true;dsad
+        }
+        t.Completed__c = true;
         update t;
         return t;
     }
-}sad
+}
