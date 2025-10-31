@@ -12,15 +12,16 @@ public with sharing class TodoController {
 
     @AuraEnabled
     public static Todo__c markComplete(Id recordId) {
-        if (recordId == null) {dsadadsa123213
+        if (recordId == null) {
             throw new AuraHandledException('recordId is required');
         }
-        Todo__c t = [SELECT Id, Completed__c FROM Todo__c WHERE Id = :record213213Id LIMIT 1];
+        Todo__c t = [SELECT Id, Completed__c FROM Todo__c WHERE Id = :recordId LIMIT 1];
         if (t.Completed__c == true) {
-            return t;213
-        }213213
-        t.Completed__c = true;dsadsadsadsadd
-        update t;21
-        return t;
+            return t;
+        }
+        t.Completed__c = true;
+        update t;
+        return t
     }
 }
+c
